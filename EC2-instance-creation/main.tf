@@ -1,5 +1,5 @@
 locals {
-  ami_id = var.use_localstack ? var.localstack_ami_id : data.aws_ami.amazon_linux_2023.id
+  ami_id = try(one(data.aws_ami.amazon_linux_2023[*].id), var.localstack_ami_id)
 }
 
 data "aws_ami" "amazon_linux_2023" {
@@ -40,8 +40,8 @@ resource "aws_key_pair" "this" {
 }
 
 resource "local_sensitive_file" "private_key" {
-  content  = tls_private_key.this.private_key_pem
-  filename = pathexpand("~/.ssh/AWS/${var.key_name}.pem")
+  content         = tls_private_key.this.private_key_pem
+  filename        = pathexpand("~/.ssh/AWS/${var.key_name}.pem")
   file_permission = "0600"
 }
 
