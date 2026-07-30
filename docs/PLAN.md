@@ -6,8 +6,8 @@
 | [x] | Terraform basics | Terminate EC2 using Terraform      | Remove resource from code and run `terraform destroy` or `apply` cleanly |
 | [x] | Terraform basics | Create S3 bucket                   | Add versioning, encryption, public access block                          |
 | [x] | Terraform basics | Attach IAM role to EC2             | Create role, policy, instance profile, attach to instance                |
-| [ ] | Terraform basics | Deploy Lambda                      | Package zip, create function, attach execution role                      |
-| [ ] | Terraform basics | Create API Gateway + Lambda        | Expose Lambda through HTTP endpoint                                      |
+| [x] | Terraform basics | Deploy Lambda                      | Package zip, create function, attach execution role                      |
+| [x] | Terraform basics | Create API Gateway + Lambda        | Expose Lambda through HTTP endpoint                                      |
 | [ ] | Terraform basics | Use variables and outputs          | Pass values through `.tfvars`, print useful outputs                      |
 | [ ] | Terraform basics | Use remote state                   | Store state in S3 with DynamoDB lock                                     |
 | [ ] | AWS core         | Connect EC2 to S3                  | Use IAM role on EC2 and AWS CLI to access bucket                         |
