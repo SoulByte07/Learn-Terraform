@@ -34,10 +34,12 @@ output "ssh_command" {
 }
 
 output "verify_commands" {
-  description = "Commands to run inside the instance to verify the S3 connection"
+  description = "Commands to run inside the instance to verify S3 read/write access"
   value = [
     "aws sts get-caller-identity",
     "aws s3 ls s3://${aws_s3_bucket.this.id}/",
     "aws s3 cp s3://${aws_s3_bucket.this.id}/hello.txt -",
+    "echo 'test' > /tmp/upload.txt && aws s3 cp /tmp/upload.txt s3://${aws_s3_bucket.this.id}/upload.txt",
+    "mkdir -p /tmp/sync && echo 'a' > /tmp/sync/a.txt && aws s3 sync /tmp/sync s3://${aws_s3_bucket.this.id}/${var.write_prefix}/sync/",
   ]
 }

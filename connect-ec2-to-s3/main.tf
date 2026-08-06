@@ -149,7 +149,17 @@ resource "aws_iam_role" "this" {
   }
 }
 
-data "aws_iam_policy_document" "s3_read_only" {
+moved {
+  from = data.aws_iam_policy_document.s3_read_only
+  to   = data.aws_iam_policy_document.s3_access
+}
+
+moved {
+  from = aws_iam_policy.s3_read_only
+  to   = aws_iam_policy.s3_access
+}
+
+data "aws_iam_policy_document" "s3_access" {
   statement {
     effect = "Allow"
     actions = [
@@ -163,20 +173,35 @@ data "aws_iam_policy_document" "s3_read_only" {
       "${aws_s3_bucket.this.arn}/*",
     ]
   }
+
+  dynamic "statement" {
+    for_each = var.permissions_mode == "read_only" ? [] : [1]
+    content {
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:PutObjectAcl",
+      ]
+      resources = var.permissions_mode == "read_write"
+        ? ["${aws_s3_bucket.this.arn}/*"]
+        : ["${aws_s3_bucket.this.arn}/${var.write_prefix}/*"]
+    }
+  }
 }
 
-resource "aws_iam_policy" "s3_read_only" {
-  name   = "${var.instance_name}-s3-read-only"
-  policy = data.aws_iam_policy_document.s3_read_only.json
+resource "aws_iam_policy" "s3_access" {
+  name   = "${var.instance_name}-s3-access"
+  policy = data.aws_iam_policy_document.s3_access.json
 
   tags = {
     Environment = var.environment
   }
 }
 
-resource "aws_iam_role_policy_attachment" "s3_read_only" {
+resource "aws_iam_role_policy_attachment" "s3_access" {
   role       = aws_iam_role.this.name
-  policy_arn = aws_iam_policy.s3_read_only.arn
+  policy_arn = aws_iam_policy.s3_access.arn
 }
 
 resource "aws_iam_instance_profile" "this" {
@@ -202,6 +227,8 @@ resource "aws_instance" "this" {
     use_localstack       = var.use_localstack
     localstack_endpoint  = var.localstack_endpoint
     aws_region           = var.aws_region
+    permissions_mode     = var.permissions_mode
+    write_prefix         = var.write_prefix
   })
 
   user_data_replace_on_change = true

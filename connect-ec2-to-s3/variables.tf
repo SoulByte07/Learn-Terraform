@@ -69,6 +69,23 @@ variable "role_name" {
   default     = null
 }
 
+variable "permissions_mode" {
+  description = "S3 access mode: read_only | read_write | read_write_prefix"
+  type        = string
+  default     = "read_only"
+
+  validation {
+    condition     = contains(["read_only", "read_write", "read_write_prefix"], var.permissions_mode)
+    error_message = "permissions_mode must be one of: read_only, read_write, read_write_prefix."
+  }
+}
+
+variable "write_prefix" {
+  description = "S3 key prefix where writes are allowed (read_write_prefix mode)"
+  type        = string
+  default     = "uploads"
+}
+
 variable "use_localstack" {
   description = "Enable LocalStack compatibility mode"
   type        = bool
